@@ -8,7 +8,6 @@
 ```
 .
 ├── docker-compose.yml
-├── requirements.txt
 ├── llm/
 │   ├── Dockerfile
 │   ├── llm_wrapper.py
