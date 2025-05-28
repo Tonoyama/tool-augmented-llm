@@ -1,20 +1,19 @@
 import openai
 import os
 
-MODEL_NAME = "mistralai/Mistral-7B-Instruct-v0.1"
+MODEL_NAME = "facebook/opt-125m"
 
 def query_llm(prompt: str) -> str:
     client = openai.OpenAI(
         base_url=os.getenv("VLLM_API_BASE", "http://localhost:8000/v1"),
-        api_key="not-needed"  # vLLMはAPIキー不要
+        api_key="EMPTY"
     )
 
-    response = client.chat.completions.create(
+    response = client.completions.create(
         model=MODEL_NAME,
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": prompt}
-        ]
+        prompt=prompt,
+        max_tokens=256,
+        temperature=0.7
     )
 
-    return response.choices[0].message.content
+    return response.choices[0].text.strip()
