@@ -1,6 +1,13 @@
 import json
 from llm_wrapper import query_llm
 from tool_registry import handle_tool_call
+import os
+from getpass import getpass
+
+if "HUGGINGFACE_HUB_TOKEN" not in os.environ:
+    print("🔐 Hugging Faceのアクセストークンを入力してください。これは保存されません。")
+    os.environ["HUGGINGFACE_HUB_TOKEN"] = getpass("Token: ")
+
 
 def build_prompt(user_input: str) -> str:
     with open("prompt_template.txt") as f:
