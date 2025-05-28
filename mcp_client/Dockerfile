@@ -8,4 +8,4 @@ RUN pip install --upgrade pip && \
 WORKDIR /workspace
 COPY . /workspace
 
-CMD ["python3", "client.py"]
+CMD ["bash"]

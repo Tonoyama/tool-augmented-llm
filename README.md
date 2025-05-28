@@ -1,4 +1,4 @@
-# 🧠 MCP関連を1から作ってみた
+# MCP関連を1から作ってみた
 
 ## 概要
 
@@ -49,10 +49,18 @@ docker-compose build
 docker-compose up
 ```
 
-### 4. クライアントの使用（ReAct含む）
+### 4. クライアント実行
+
+#### 通常モード
 
 ```bash
-docker-compose run mcp_client
+docker-compose run mcp_client python3 react.py
+```
+
+#### ReActモード
+
+```bash
+docker-compose run mcp_client python3 react_client.py
 ```
 
 ## 各コンポーネントの役割
