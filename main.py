@@ -9,7 +9,8 @@ def build_prompt(user_input: str) -> str:
     return system_prompt + f"\nUser: {user_input}"
 
 def main():
-    user_input = input("You: ")
+    user_input = "How is the weather in Tokyo?"
+    print("User input:", user_input)
     prompt = build_prompt(user_input)
     
     llm_output = query_llm(prompt)
