@@ -21,23 +21,29 @@ def main():
         print("\nLLM output:\n", llm_output)
         history.append(llm_output)
 
-        # ツール呼び出しの抽出
         try:
             json_start = llm_output.index("{")
-            json_data = json.loads(llm_output[json_start:])
-            tool_call = json_data.get("tool_call")
+            tool_call = json.loads(llm_output[json_start:])["tool_call"]
 
-            if not tool_call:
-                print("\n✅ Final Answer:")
-                break
+            request_payload = {
+                "jsonrpc": "2.0",
+                "method": "tools/call",
+                "params": {
+                    "name": tool_call["name"],
+                    "arguments": tool_call["arguments"]
+                },
+                "id": 1
+            }
 
-            # ツール呼び出し
-            tool_response = requests.post("http://mcp_server:8000/tool-call", json=json_data)
-            observation = tool_response.json()["result"]
+            response = requests.post("http://mcp_server:8000/tool-call", json=request_payload)
+            observation = response.json().get("result", "")
             print("\n🛠 Tool result:", observation)
 
-            # Observationを履歴に追加し、次の思考に繋げる
             history.append(f"Observation: {observation}")
+
+            # Final Answer 判定
+            if "Final Answer:" in llm_output:
+                break
 
         except Exception as e:
             print("\n❌ Failed to parse or execute tool call:", e)

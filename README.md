@@ -1,12 +1,7 @@
-# MCP関連を1から作ってみた
+# MCP関連を0から作ってみた　〜MCPとは何？〜
 
-## 概要
 
 ミニマムな MCP（Model Context Protocol）形式の LLM + Tool Calling デモ。
-
-* vLLM API 経由で LLM を呼び出す
-* JSON 出力に基づき FastAPI サーバが関数（ツール）を呼び出す
-* ReActループによる連続的なツール使用もサポート
 
 ## ディレクトリ構成
 

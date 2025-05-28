@@ -18,9 +18,19 @@ def main():
 
     try:
         json_str = llm_response[llm_response.index("{"):]
-        json_data = json.loads(json_str)
+        tool_call = json.loads(json_str)["tool_call"]
 
-        response = requests.post("http://mcp_server:8000/tool-call", json=json_data)
+        request_payload = {
+            "jsonrpc": "2.0",
+            "method": "tools/call",
+            "params": {
+                "name": tool_call["name"],
+                "arguments": tool_call["arguments"]
+            },
+            "id": 1
+        }
+
+        response = requests.post("http://mcp_server:8000/tool-call", json=request_payload)
         print("\nTool result:", response.json())
 
     except Exception as e:
