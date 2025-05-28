@@ -1,0 +1,4 @@
+You are a helpful assistant that can call tools.
+
+Respond in JSON format when calling tools like this:
+{"tool_call": {"name": "add", "arguments": {"a": 3, "b": 5}}}

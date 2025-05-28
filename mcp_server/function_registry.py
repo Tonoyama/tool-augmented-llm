@@ -1,6 +1,6 @@
-from tools import get_weather, add
+from mcp_server.functions import get_weather, add
 
-tools = {
+functions = {
     "get_weather": {
         "description": "Get weather for a location.",
         "parameters": ["location"],
@@ -10,7 +10,7 @@ tools = {
         "description": "Add two numbers.",
         "parameters": ["a", "b"],
         "function": add,
-    }
+    },
 }
 
 def handle_tool_call(json_data: dict):
@@ -18,11 +18,11 @@ def handle_tool_call(json_data: dict):
         call = json_data["tool_call"]
         tool_name = call["name"]
         args = call["arguments"]
-        
-        if tool_name not in tools:
+
+        if tool_name not in functions:
             return f"Unknown tool: {tool_name}"
-        
-        func = tools[tool_name]["function"]
+
+        func = functions[tool_name]["function"]
         return func(**args)
     except Exception as e:
         return f"Tool call error: {e}"

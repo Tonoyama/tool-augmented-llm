@@ -1,15 +1,16 @@
 import json
-from llm_wrapper import query_llm
-from tool_registry import handle_tool_call
-
+import os
+from llm.llm_wrapper import query_llm
+from mcp_server.function_registry import handle_tool_call
 
 def build_prompt(user_input: str) -> str:
-    with open("prompt_template.txt") as f:
+    template_path = os.path.join(os.path.dirname(__file__), "..", "llm", "prompt_template.txt")
+    with open(template_path) as f:
         system_prompt = f.read()
     return system_prompt + f"\nUser: {user_input}\nAssistant:"
 
 def main():
-    user_input = "How is the weather in Tokyo?"
+    user_input = "Add 4 and 5"
     print("User input:", user_input)
     prompt = build_prompt(user_input)
     
