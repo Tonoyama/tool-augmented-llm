@@ -1,6 +1,7 @@
 import openai
+import os
 
-openai.api_base = "http://localhost:8000/v1"
+openai.api_base = os.getenv("VLLM_API_BASE", "http://localhost:8000/v1")
 openai.api_key = "not-needed"
 
 MODEL_NAME = "mistralai/Mistral-7B-Instruct-v0.1"
