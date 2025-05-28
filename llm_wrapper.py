@@ -1,5 +1,16 @@
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
+import os
+from huggingface_hub import login
+from dotenv import load_dotenv
+
+load_dotenv()
+hf_token = os.getenv("HUGGINGFACE_HUB_TOKEN")
+
+if hf_token is None:
+    raise RuntimeError("Missing HUGGINGFACE_HUB_TOKEN in .env")
+
+login(hf_token)
 
 MODEL_NAME = "mistralai/Mistral-7B-Instruct-v0.1"  # 任意のモデル
 
