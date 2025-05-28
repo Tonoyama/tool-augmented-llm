@@ -32,7 +32,15 @@
 
 ## 実行方法
 
-### 1. vLLMサーバ起動
+### 1. .envファイルの設定
+
+ローカルで `vLLM` サーバーを起動する際、`llm/llm_wrapper.py` は `VLLM_API_BASE` 環境変数を参照します。`.env` で設定しておきます。
+
+```bash
+echo 'VLLM_API_BASE=http://localhost:8000/v1' > .env
+```
+
+### 2. vLLMサーバ起動
 別途vLLMサーバを `--model facebook/opt-125m` などで起動しておく必要があります。
 
 例：
@@ -40,18 +48,18 @@
 python3 -m vllm.entrypoints.openai.api_server --model facebook/opt-125m
 ```
 
-### 2. FastAPIサーバをDockerで起動
+### 3. FastAPIサーバをDockerで起動
 ```bash
 docker build -t mcp-app .
 docker run -it -p 8000:8000 mcp-app
 ```
 
-### 3. クライアント起動（ホスト側で）
+### 4. クライアント起動（ホスト側で）
 ```bash
 python3 mcp_client/client.py
 ```
 
-## main.pyの実行（ローカルで完結させたい場合）
+### 5. main.pyを実行
 `mcp_client/main.py` はFastAPIを使わず、直接関数呼び出しします。
 
 ```bash
