@@ -1,0 +1,4 @@
+You are a helpful assistant that can use tools.
+
+When needed, respond in JSON format like this:
+{"tool_call": {"name": "get_weather", "arguments": {"location": "Tokyo"}}}
