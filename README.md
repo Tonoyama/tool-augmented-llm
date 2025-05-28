@@ -2,85 +2,75 @@
 
 ## 概要
 
-ミニマムなMCP（Model Context Protocol）形式のLLM + Tool Calling サンプル。
+ミニマムな MCP（Model Context Protocol）形式の LLM + Tool Calling デモ。
 
-- vLLM API 経由で LLM を呼び出す
-- JSON出力に基づき FastAPI ベースのサーバで関数を呼び出す
+* vLLM API 経由で LLM を呼び出す
+* JSON 出力に基づき FastAPI サーバが関数（ツール）を呼び出す
+* ReActループによる連続的なツール使用もサポート
 
 ## ディレクトリ構成
 
 ```
 .
-├── Dockerfile
+├── docker-compose.yml
 ├── requirements.txt
-├── .env
-├── .dockerignore
-├── .gitignore
-├── llm/                      # LLMとのやりとりに関するコード
-│   ├── llm_wrapper.py       # vLLMのOpenAI互換APIを呼び出すクライアント
-│   └── prompt_template.txt  # プロンプトテンプレート（ツール呼び出しの指示例など）
-│
-├── mcp_client/               # クライアント実装
-│   ├── client.py            # ユーザーからの入力をプロンプトに変換→LLM→結果をAPI送信
-│   └── main.py              # JSON出力を直接ローカルで処理（サーバを経由しないテスト用）
-│
-└── mcp_server/               # FastAPIベースのMCPサーバ
-     ├── server.py            # /tool-call エンドポイント定義
-     ├── functions.py         # 実行対象となるツール関数の実体
-     └── function_registry.py # ツール名→関数のルーティングと安全な呼び出しラッパー
+├── llm/
+│   ├── Dockerfile
+│   ├── llm_wrapper.py
+│   ├── prompt_template.txt
+│   └── react_prompt_template.txt
+├── mcp_client/
+│   ├── Dockerfile
+│   ├── client.py
+│   └── react_client.py
+├── mcp_server/
+│   ├── Dockerfile
+│   ├── function_registry.py
+│   ├── functions.py
+│   └── server.py
 ```
 
-## 実行方法
+## 起動方法
 
-### 1. .envファイルの設定
-
-ローカルで `vLLM` サーバーを起動する際、`llm/llm_wrapper.py` は `VLLM_API_BASE` 環境変数を参照します。`.env` で設定しておきます。
+### 1. `.env` ファイルの作成
 
 ```bash
-echo 'VLLM_API_BASE=http://localhost:8000/v1' > .env
+echo 'VLLM_API_BASE=http://llm:8001/v1' > .env
 ```
 
-### 2. vLLMサーバ起動
-別途vLLMサーバを `--model facebook/opt-125m` などで起動しておく必要があります。
+### 2. vLLM起動（Dockerで起動する場合）
 
-例：
+`llm/Dockerfile` をビルド・実行することで `vllm.entrypoints.openai.api_server` が起動されます。
+
+### 3. docker-compose で起動
+
 ```bash
-python3 -m vllm.entrypoints.openai.api_server --model facebook/opt-125m
+docker-compose build
+docker-compose up
 ```
 
-### 3. FastAPIサーバをDockerで起動
+### 4. クライアントの使用（ReAct含む）
+
 ```bash
-docker build -t mcp-app .
-docker run --env-file .env -it -p 8000:8000 mcp-app
+docker-compose run mcp_client
 ```
 
-### 4. クライアント起動（ホスト側で）
-```bash
-python3 mcp_client/client.py
-```
+## 各コンポーネントの役割
 
-## 必要要件
-- vLLM server（別途起動が必要）
-- Docker
-- CUDA 12.1対応GPU環境（例：RTX 3090, VRAM 24GB）
+* `llm/llm_wrapper.py`: OpenAI互換API経由でプロンプトを送信し、応答を取得
+* `mcp_client/client.py`: ユーザー入力をプロンプトにし、LLM → Tool Call を自動で実行
+* `mcp_client/react_client.py`: ReAct形式に従い、LLMとTool Callをループ処理
+* `mcp_server/`: JSON tool\_callを受け取り、適切なPython関数を呼び出す
 
-## 発展的な実装
+## 開発に役立つ Tips
 
-本リポジトリを拡張することで以下を実装することができます。
+* prompt_template.txt に複数例を書くと、Tool Calling の精度が上がる
+* JSON出力が壊れる場合は temperature を 0.2–0.5 に下げると安定
+* ReAct形式では履歴を丁寧に保持することで推論が向上する
 
-### REACTループ構造の追加
+## 今後の拡張案
 
-LLMが「思考 → ツール呼び出し → 観察 → 次の思考...」を繰り返すことで、複雑な課題にも対応できるようになります。
-
-例：`mcp_client/client.py` にループを追加して、複数のツール呼び出しと回答生成を連鎖的に行えます。
-
-### メモリ拡張：対話履歴の保持
-
-プロンプト生成時に過去の対話・ツール呼び出し結果を追記することで、LLMが文脈を維持した応答を出せるようになります。
-
-例：`build_prompt()` に履歴バッファを追加し、直近数回分をプロンプトへ差し込む。
-
-## 備考
-
-- prompt_template.txt にTool Callの例を記載するとツール呼び出し精度が上がります。
-- JSONが壊れる場合は `temperature` を下げる、 `max_tokens` を制限するなど調整してください。
+* tool registry をJSON Schemaベースにする
+* tool functionを自動登録（importlib + inspectでscan）
+* GPT-4など大規模モデルへの切替
+* vLLMのmulti-GPU推論設定（PagedAttention, CUDA配分）

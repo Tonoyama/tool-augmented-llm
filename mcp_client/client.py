@@ -20,7 +20,7 @@ def main():
         json_str = llm_response[llm_response.index("{"):]
         json_data = json.loads(json_str)
 
-        response = requests.post("http://localhost:8000/tool-call", json=json_data)
+        response = requests.post("http://mcp_server:8000/tool-call", json=json_data)
         print("\nTool result:", response.json())
 
     except Exception as e:

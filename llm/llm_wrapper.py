@@ -7,7 +7,7 @@ load_dotenv()
 MODEL_NAME = "facebook/opt-125m"
 
 client = openai.OpenAI(
-    base_url=os.getenv("VLLM_API_BASE", "http://localhost:8000/v1"),
+    base_url=os.getenv("VLLM_API_BASE", "http://llm:8000/v1"),
     api_key="EMPTY"
 )
 

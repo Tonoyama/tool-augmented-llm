@@ -32,7 +32,7 @@ def main():
                 break
 
             # ツール呼び出し
-            tool_response = requests.post("http://localhost:8000/tool-call", json=json_data)
+            tool_response = requests.post("http://mcp_server:8000/tool-call", json=json_data)
             observation = tool_response.json()["result"]
             print("\n🛠 Tool result:", observation)
 
