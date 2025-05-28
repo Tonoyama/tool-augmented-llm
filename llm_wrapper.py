@@ -8,7 +8,10 @@ load_dotenv()
 hf_token = os.getenv("HUGGINGFACE_HUB_TOKEN")
 
 if hf_token is None:
-    raise RuntimeError("Missing HUGGINGFACE_HUB_TOKEN in .env")
+    print("⚠️ Hugging Face トークンが .env に見つかりませんでした。")
+    from getpass import getpass
+    hf_token = getpass("🔑 Hugging Face Tokenを入力してください（表示されません）: ")
+
 
 login(hf_token)
 
