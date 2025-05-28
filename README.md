@@ -54,7 +54,7 @@ docker-compose up
 #### 通常モード
 
 ```bash
-docker-compose run mcp_client python3 react.py
+docker-compose run mcp_client python3 client.py
 ```
 
 #### ReActモード

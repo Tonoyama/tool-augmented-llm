@@ -6,6 +6,6 @@ RUN pip install --upgrade pip && \
     pip install openai>=1.52.2 vllm>=0.6.3 triton>=3.1.0 python-dotenv
 
 WORKDIR /workspace
-COPY *py *.txt /workspace/
+COPY llm_wrapper.py prompt_template.txt react_prompt_template.txt /workspace/
 
 CMD ["python3", "-m", "vllm.entrypoints.openai.api_server", "--model", "facebook/opt-125m", "--port", "8001"]
