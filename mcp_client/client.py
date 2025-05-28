@@ -1,9 +1,11 @@
 import json
+import os
 import requests
 from llm.llm_wrapper import query_llm
 
 def build_prompt(user_input: str) -> str:
-    with open("prompt_template.txt") as f:
+    template_path = os.path.join(os.path.dirname(__file__), "..", "llm", "prompt_template.txt")
+    with open(template_path) as f:
         template = f.read()
     return f"{template}\nUser: {user_input}\nAssistant:"
 

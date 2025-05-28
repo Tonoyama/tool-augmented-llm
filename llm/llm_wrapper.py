@@ -1,5 +1,8 @@
 import openai
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 MODEL_NAME = "facebook/opt-125m"
 

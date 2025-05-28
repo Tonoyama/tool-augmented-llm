@@ -64,5 +64,6 @@ python3 mcp_client/main.py
 - CUDA 12.1対応GPU環境（例：RTX 3090, VRAM 24GB）
 
 ## 備考
+
 - prompt_template.txt にTool Callの例を記載するとツール呼び出し精度が上がります。
 - JSONが壊れる場合は `temperature` を下げる、 `max_tokens` を制限するなど調整してください。
