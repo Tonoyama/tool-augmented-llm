@@ -72,5 +72,4 @@ docker-compose run mcp_client
 
 * tool registry をJSON Schemaベースにする
 * tool functionを自動登録（importlib + inspectでscan）
-* GPT-4など大規模モデルへの切替
-* vLLMのmulti-GPU推論設定（PagedAttention, CUDA配分）
+* vLLMの分散並列推論
