@@ -1,6 +1,4 @@
-import os
-import json
-import requests
+import os, json, re, requests
 from llm.llm_wrapper import query_llm
 
 def build_react_prompt(history):
@@ -22,8 +20,10 @@ def main():
         history.append(llm_output)
 
         try:
-            json_start = llm_output.index("{")
-            tool_call = json.loads(llm_output[json_start:])["tool_call"]
+            match = re.search(r'{.*}', llm_output, re.DOTALL)
+            if not match:
+                raise ValueError("Tool call JSON not found")
+            tool_call = json.loads(match.group())["tool_call"]
 
             request_payload = {
                 "jsonrpc": "2.0",
@@ -35,13 +35,12 @@ def main():
                 "id": 1
             }
 
-            response = requests.post("http://mcp_server:8000/tool-call", json=request_payload)
-            observation = response.json().get("result", "")
+            response = requests.post("http://mcp_server:8000/jsonrpc", json=request_payload)
+            observation = response.json().get("result", {})
             print("\n🛠 Tool result:", observation)
 
             history.append(f"Observation: {observation}")
 
-            # Final Answer 判定
             if "Final Answer:" in llm_output:
                 break
 

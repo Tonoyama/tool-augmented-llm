@@ -1,5 +1,5 @@
 import json
-import os
+import os, re
 import requests
 from llm.llm_wrapper import query_llm
 
@@ -17,8 +17,11 @@ def main():
     print("\nLLM output:", llm_response)
 
     try:
-        json_str = llm_response[llm_response.index("{"):]
-        tool_call = json.loads(json_str)["tool_call"]
+        match = re.search(r'{.*}', llm_response, re.DOTALL)
+        if not match:
+            raise ValueError("Tool call JSON not found in LLM output")
+
+        tool_call = json.loads(match.group())["tool_call"]
 
         request_payload = {
             "jsonrpc": "2.0",
@@ -30,7 +33,7 @@ def main():
             "id": 1
         }
 
-        response = requests.post("http://mcp_server:8000/tool-call", json=request_payload)
+        response = requests.post("http://mcp_server:8000/jsonrpc", json=request_payload)
         print("\nTool result:", response.json())
 
     except Exception as e:

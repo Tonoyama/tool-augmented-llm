@@ -18,4 +18,6 @@ def query_llm(prompt: str) -> str:
         max_tokens=256,
         temperature=0.7
     )
+    if not response.choices or not hasattr(response.choices[0], "text"):
+        raise ValueError("Invalid LLM response")
     return response.choices[0].text.strip()

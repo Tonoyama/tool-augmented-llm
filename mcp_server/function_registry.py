@@ -1,4 +1,3 @@
-# mcp_server/function_registry.py
 from mcp_server.functions import get_weather, add
 
 functions = {
@@ -27,9 +26,8 @@ functions = {
     },
 }
 
-def handle_tool_call(json_data: dict):
+def handle_tool_call(params: dict):
     try:
-        params = json_data.get("params", {})
         tool_name = params.get("name")
         args = params.get("arguments", {})
 
@@ -49,7 +47,7 @@ def handle_tool_call(json_data: dict):
         }
     except Exception as e:
         return {
-            "tool_name": json_data.get("params", {}).get("name"),
+            "tool_name": params.get("name"),
             "isError": True,
             "result": f"Tool call error: {e}"
         }
