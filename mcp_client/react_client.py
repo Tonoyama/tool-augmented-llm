@@ -6,36 +6,41 @@ from llm.llm_wrapper import query_llm
 def build_react_prompt(history):
     template_path = os.path.join(os.path.dirname(__file__), "..", "llm", "react_prompt_template.txt")
     with open(template_path) as f:
-        base = f.read()
-    return base + "\n" + "\n".join(history)
+        base_prompt = f.read()
+    return base_prompt + "\n" + "\n".join(history)
 
 def main():
     history = []
     user_input = input("You: ")
     history.append(f"User: {user_input}")
+    history.append("Assistant:")
 
     while True:
         prompt = build_react_prompt(history)
-        response = query_llm(prompt)
-        print("\nLLM output:", response)
+        llm_output = query_llm(prompt)
+        print("\nLLM output:\n", llm_output)
+        history.append(llm_output)
 
-        history.append(f"Assistant: {response}")
-
-        # Try to extract tool_call from LLM response
+        # ツール呼び出しの抽出
         try:
-            json_start = response.index("{")
-            json_data = json.loads(response[json_start:])
+            json_start = llm_output.index("{")
+            json_data = json.loads(llm_output[json_start:])
             tool_call = json_data.get("tool_call")
+
             if not tool_call:
-                print("No more tool calls. Final Answer:")
+                print("\n✅ Final Answer:")
                 break
 
-            tool_result = requests.post("http://localhost:8000/tool-call", json=json_data).json()["result"]
-            print("Tool result:", tool_result)
-            history.append(f"Observation: {tool_result}")
+            # ツール呼び出し
+            tool_response = requests.post("http://localhost:8000/tool-call", json=json_data)
+            observation = tool_response.json()["result"]
+            print("\n🛠 Tool result:", observation)
+
+            # Observationを履歴に追加し、次の思考に繋げる
+            history.append(f"Observation: {observation}")
 
         except Exception as e:
-            print("Error parsing tool call:", e)
+            print("\n❌ Failed to parse or execute tool call:", e)
             break
 
 if __name__ == "__main__":
